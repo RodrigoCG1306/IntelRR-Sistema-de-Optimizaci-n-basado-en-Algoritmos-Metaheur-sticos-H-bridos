@@ -2,11 +2,11 @@
 
 ## Proyecto Final – Optimización de rutas
 
-**Alumno:** José Rodrigo Cázares Godoy
-**Carrera:** Ingeniería en Computación (8vo semestre)
-**Profesor:** Mtro. Santo Rubio Pano
-**Universidad:** CUCosta
-**Entrega:** 18 de mayo de 2026
+* **Alumno:** José Rodrigo Cázares Godoy
+* **Carrera:** Ingeniería en Computación (8vo semestre)
+* **Profesor:** Mtro. Santo Rubio Pano
+* **Universidad:** CUCosta
+* **Entrega:** 18 de mayo de 2026
 
 ---
 
