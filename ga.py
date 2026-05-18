@@ -1,158 +1,164 @@
 """
 ga.py
-Implementación del Algoritmo Genético híbrido para optimización de rutas.
+Algoritmo Genético híbrido.
 """
 
 import random
-from utils import total_distance
+
+from utils import (
+    NUM_LOCATIONS,
+    fitness,
+    calculate_distance,
+    calculate_time,
+    calculate_cost
+)
 
 
-def create_population(size, num_cities):
+
+def create_population(size):
     """
-    Genera la población inicial de soluciones.
-
-    Cada individuo es una permutación de ciudades.
-
-    Parámetros:
-        size (int): tamaño de la población
-        num_cities (int): número de ciudades
-
-    Retorna:
-        list[list]: población inicial
+    Genera población inicial.
     """
+
     population = []
-    base = list(range(num_cities))
+
+    base = list(range(NUM_LOCATIONS))
 
     for _ in range(size):
+
         individual = base[:]
+
         random.shuffle(individual)
+
         population.append(individual)
 
     return population
 
 
-def selection(population, cities):
-    """
-    Selección por torneo (elige el mejor de dos).
 
-    Parámetros:
-        population (list): lista de individuos
-        cities (list): coordenadas
-
-    Retorna:
-        list: individuo seleccionado
+def selection(population):
     """
+    Selección por torneo.
+    """
+
     a, b = random.sample(population, 2)
-    return a if total_distance(a, cities) < total_distance(b, cities) else b
+
+    return a if fitness(a) > fitness(b) else b
+
 
 
 def crossover(parent1, parent2):
     """
-    Cruce ordenado para mantener rutas válidas.
-
-    Parámetros:
-        parent1, parent2 (list): padres
-
-    Retorna:
-        list: hijo generado
+    Cruce ordenado.
     """
+
     size = len(parent1)
+
     start, end = sorted(random.sample(range(size), 2))
 
     child = [-1] * size
+
     child[start:end] = parent1[start:end]
 
     pointer = 0
+
     for gene in parent2:
+
         if gene not in child:
+
             while child[pointer] != -1:
                 pointer += 1
+
             child[pointer] = gene
 
     return child
 
 
+
 def mutate(individual):
     """
-    Mutación por intercambio de dos posiciones.
-
-    Parámetros:
-        individual (list): solución
+    Mutación.
     """
+
     i, j = random.sample(range(len(individual)), 2)
+
     individual[i], individual[j] = individual[j], individual[i]
 
 
-def local_search(route, cities):
+def local_search(route):
     """
-    Mejora local (hibridación del algoritmo).
-
-    Aplica pequeñas perturbaciones y conserva mejoras.
-    Esto convierte el GA en un enfoque híbrido.
-
-    Parámetros:
-        route (list): solución inicial
-        cities (list): coordenadas
-
-    Retorna:
-        list: solución mejorada
+    Búsqueda local.
     """
+
     best = route[:]
 
-    for _ in range(10):
-        i, j = random.sample(range(len(route)), 2)
-        new = best[:]
-        new[i], new[j] = new[j], new[i]
+    best_score = fitness(best)
 
-        if total_distance(new, cities) < total_distance(best, cities):
-            best = new
+    for _ in range(10):
+
+        new_route = best[:]
+
+        i, j = random.sample(range(len(route)), 2)
+
+        # intercambiar posiciones
+        new_route[i], new_route[j] = (
+            new_route[j],
+            new_route[i]
+        )
+
+        new_score = fitness(new_route)
+
+        # conservar mejora
+        if new_score > best_score:
+
+            best = new_route
+
+            best_score = new_score
 
     return best
 
-
-def run_ga(cities, pop_size=50, generations=200):
+def run_ga(pop_size=50, generations=100):
     """
-    Ejecuta el algoritmo genético híbrido.
-
-    Parámetros:
-        cities (list): coordenadas
-        pop_size (int): tamaño de población
-        generations (int): número de iteraciones
-
-    Retorna:
-        tuple:
-            - mejor ruta encontrada
-            - historial de fitness
+    Ejecuta el algoritmo.
     """
-    num_cities = len(cities)
-    population = create_population(pop_size, num_cities)
+
+    population = create_population(pop_size)
 
     history = []
 
     for gen in range(generations):
+
         new_population = []
 
         for _ in range(pop_size):
-            p1 = selection(population, cities)
-            p2 = selection(population, cities)
+
+            p1 = selection(population)
+            p2 = selection(population)
 
             child = crossover(p1, p2)
 
             if random.random() < 0.1:
                 mutate(child)
 
-            # 🔥 hibridación
-            child = local_search(child, cities)
+            # Hibridación
+            child = local_search(child)
 
             new_population.append(child)
 
         population = new_population
 
-        best = min(population, key=lambda x: total_distance(x, cities))
-        best_dist = total_distance(best, cities)
+        best = max(population, key=fitness)
 
-        history.append(best_dist)
+        best_fitness = fitness(best)
 
-        print(f"Gen {gen} -> {best_dist:.2f}")
+        history.append(best_fitness)
+
+        print(
+            f"Gen {gen} | "
+            f"Fitness: {best_fitness:.6f} | "
+            f"Distancia: {calculate_distance(best):.2f} | "
+            f"Tiempo: {calculate_time(best):.2f} | "
+            f"Costo: {calculate_cost(best):.2f}"
+        )
 
     return best, history

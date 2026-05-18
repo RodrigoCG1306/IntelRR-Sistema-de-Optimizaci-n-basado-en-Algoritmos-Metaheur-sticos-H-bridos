@@ -1,20 +1,25 @@
 """
 plot.py
-Funciones para visualización de resultados.
+Visualización.
 """
 
 import matplotlib.pyplot as plt
 
-def plot_convergence(history):
-    """
-    Grafica la evolución del fitness.
 
-    Parámetros:
-        history (list): valores de fitness por generación
+
+def plot_results(history):
     """
+    Fitness vs iteraciones.
+    """
+
     plt.plot(history)
-    plt.xlabel("Generación")
-    plt.ylabel("Distancia")
-    plt.title("Convergencia del Algoritmo Genético")
+
+    plt.xlabel("Iteraciones")
+
+    plt.ylabel("Fitness")
+
+    plt.title("Fitness vs Iteraciones")
+
     plt.grid()
-    plt.show() 
+
+    plt.show()

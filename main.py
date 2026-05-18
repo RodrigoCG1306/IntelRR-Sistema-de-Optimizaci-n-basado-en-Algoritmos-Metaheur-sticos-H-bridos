@@ -1,29 +1,23 @@
 """
 main.py
-Archivo principal que ejecuta el proyecto completo.
+Ejecución principal.
 """
 
-from utils import generate_cities
 from ga import run_ga
-from plot import plot_convergence
+from plot import plot_results
 
 
 def main():
-    """
-    Flujo principal del programa.
-    """
-    # Generar problema (ciudades)
-    cities = generate_cities(10)
 
-    # Ejecutar algoritmo
-    best_route, history = run_ga(cities)
+    best_solution, history = run_ga(
+        pop_size=50,
+        generations=100
+    )
 
-    # Mostrar resultado
-    print("\nMejor ruta encontrada:")
-    print(best_route)
+    print("\nMejor solución encontrada:\n")
+    print(best_solution)
 
-    # Graficar resultados
-    plot_convergence(history)
+    plot_results(history)
 
 
 if __name__ == "__main__":

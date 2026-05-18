@@ -1,53 +1,74 @@
 """
 utils.py
-Funciones auxiliares para generación de ciudades y cálculo de distancias.
+Funciones auxiliares.
 """
 
 import random
-import math
 
-def generate_cities(n):
+NUM_LOCATIONS = 10
+
+# Generar puntos aleatorios
+locations = [
+    (
+        random.randint(0, 100),
+        random.randint(0, 100)
+    )
+    for _ in range(NUM_LOCATIONS)
+]
+
+def calculate_distance(route):
     """
-    Genera una lista de ciudades con coordenadas aleatorias.
-
-    Parámetros:
-        n (int): número de ciudades
-
-    Retorna:
-        list[tuple]: lista de coordenadas (x, y)
+    Distancia total.
     """
-    return [(random.randint(0, 100), random.randint(0, 100)) for _ in range(n)]
 
+    total = 0
 
-def distance(a, b):
+    for i in range(len(route) - 1):
+
+        x1, y1 = locations[route[i]]
+        x2, y2 = locations[route[i + 1]]
+
+        distance = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
+
+        total += distance
+
+    return total
+
+def calculate_time(route):
     """
-    Calcula la distancia euclidiana entre dos puntos.
-
-    Parámetros:
-        a (tuple): punto (x, y)
-        b (tuple): punto (x, y)
-
-    Retorna:
-        float: distancia entre los puntos
+    Tiempo total estimado.
     """
-    return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
 
+    distance = calculate_distance(route)
 
-def total_distance(route, cities):
+    traffic_factor = 1.2
+
+    return distance * traffic_factor
+
+def calculate_cost(route):
     """
-    Calcula la distancia total de una ruta (fitness).
-
-    Parámetros:
-        route (list): orden de visita de las ciudades
-        cities (list): lista de coordenadas
-
-    Retorna:
-        float: distancia total del recorrido
+    Costo total estimado.
     """
-    dist = 0
-    for i in range(len(route)):
-        dist += distance(
-            cities[route[i]],
-            cities[route[(i+1) % len(route)]
-        ])
-    return dist
+
+    distance = calculate_distance(route)
+
+    fuel_cost = 0.5
+
+    return distance * fuel_cost
+
+def fitness(route):
+    """
+    Fitness multiobjetivo.
+
+    Menor distancia, tiempo y costo
+    generan mejor fitness.
+    """
+
+    distance = calculate_distance(route)
+    time = calculate_time(route)
+    cost = calculate_cost(route)
+
+    # Minimización multiobjetivo
+    score = 1 / (distance + time + cost)
+
+    return score
